@@ -9,17 +9,17 @@ const redisHost = process.env.REDIS_HOST;
 const redisPort = process.env.REDIS_PORT;
 const redisPassword = process.env.REDIS_PASSWORD;
 
-/// Base de datos de apimovil
-const apimovilDBHost = process.env.APIMOVIL_DB_HOST;
-const apimovilDBUser = process.env.APIMOVIL_DB_USER;
-const apimovilDBPassword = process.env.APIMOVIL_DB_PASSWORD;
-const apimovilDBName = process.env.APIMOVIL_DB_NAME;
-const apimovilDBPort = process.env.APIMOVIL_DB_PORT;
+/// Base de datos de API_FF_MOVI
+const API_FF_MOVIDBHost = process.env.API_FF_MOVI_DB_HOST;
+const API_FF_MOVIDBUser = process.env.API_FF_MOVI_DB_USER;
+const API_FF_MOVIDBPassword = process.env.API_FF_MOVI_DB_PASSWORD;
+const API_FF_MOVIDBName = process.env.API_FF_MOVI_DB_NAME;
+const API_FF_MOVIDBPort = process.env.API_FF_MOVI_DB_PORT;
 
-/// Usuario y contraseña para los logs de la base de datos de apimovil
-const apimovilDbUserForLogs = process.env.APIMOVIL_DB_USER_FOR_LOGS;
-const apimovilDbPasswordForLogs = process.env.APIMOVIL_DB_PASSWORD_FOR_LOGS;
-const apimovilDbNameForLogs = process.env.APIMOVIL_DB_NAME_FOR_LOGS;
+/// Usuario y contraseña para los logs de la base de datos de API_FF_MOVI
+const API_FF_MOVIDbUserForLogs = process.env.API_FF_MOVI_DB_USER_FOR_LOGS;
+const API_FF_MOVIDbPasswordForLogs = process.env.API_FF_MOVI_DB_PASSWORD_FOR_LOGS;
+const API_FF_MOVIDbNameForLogs = process.env.API_FF_MOVI_DB_NAME_FOR_LOGS;
 
 export const redisClient = redis.createClient({
     socket: {
@@ -42,20 +42,20 @@ let clientList = {};
 
 export function getDbConfig(companyId) {
     return {
-        host: apimovilDBHost,
-        user: apimovilDBUser + companyId,
-        password: apimovilDBPassword + companyId,
-        database: apimovilDBName,
-        port: apimovilDBPort
+        host: API_FF_MOVIDBHost,
+        user: API_FF_MOVIDBUser + companyId,
+        password: API_FF_MOVIDBPassword + companyId,
+        database: API_FF_MOVIDBName,
+        port: API_FF_MOVIDBPort
     };
 }
 
 export const poolLocal = mysql2.createPool({
-    host: apimovilDBHost,
-    user: apimovilDbUserForLogs,
-    password: apimovilDbPasswordForLogs,
-    database: apimovilDbNameForLogs,
-    port: apimovilDBPort,
+    host: API_FF_MOVIDBHost,
+    user: API_FF_MOVIDbUserForLogs,
+    password: API_FF_MOVIDbPasswordForLogs,
+    database: API_FF_MOVIDbNameForLogs,
+    port: API_FF_MOVIDBPort,
     waitForConnections: true,
     connectionLimit: 10,
     queueLimit: 0
