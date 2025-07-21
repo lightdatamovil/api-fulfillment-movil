@@ -1,7 +1,7 @@
 import redis from 'redis';
 import dotenv from 'dotenv';
 import mysql2 from 'mysql2';
-import { logRed, logYellow } from './src/logCustom.js';
+import { logPurple, logRed, logYellow } from './src/logCustom.js';
 dotenv.config({ path: process.env.ENV_FILE || ".env" });
 
 /// Redis para obtener las empresas
@@ -10,16 +10,16 @@ const redisPort = process.env.REDIS_PORT;
 const redisPassword = process.env.REDIS_PASSWORD;
 
 /// Base de datos de API_FF_MOVI
-const API_FF_MOVIDBHost = process.env.API_FF_MOVI_DB_HOST;
-const API_FF_MOVIDBUser = process.env.API_FF_MOVI_DB_USER;
-const API_FF_MOVIDBPassword = process.env.API_FF_MOVI_DB_PASSWORD;
-const API_FF_MOVIDBName = process.env.API_FF_MOVI_DB_NAME;
-const API_FF_MOVIDBPort = process.env.API_FF_MOVI_DB_PORT;
+const apiffDBHost = process.env.API_FF_MOVIL_DB_HOST;
+const apiffDBUser = process.env.API_FF_MOVIL_DB_USER;
+const apiffDBPassword = process.env.API_FF_MOVIL_DB_PASSWORD;
+const apiffDBName = process.env.API_FF_MOVIL_DB_NAME;
+const apiffDBPort = process.env.API_FF_MOVIL_DB_PORT;
 
 /// Usuario y contraseña para los logs de la base de datos de API_FF_MOVI
-const API_FF_MOVIDbUserForLogs = process.env.API_FF_MOVI_DB_USER_FOR_LOGS;
-const API_FF_MOVIDbPasswordForLogs = process.env.API_FF_MOVI_DB_PASSWORD_FOR_LOGS;
-const API_FF_MOVIDbNameForLogs = process.env.API_FF_MOVI_DB_NAME_FOR_LOGS;
+const apiffDBUserForLogs = process.env.API_FF_MOVIL_DB_USER_FOR_LOGS;
+const apiffDBPasswordForLogs = process.env.API_FF_MOVIL_DB_PASSWORD_FOR_LOGS;
+const apiffDBNameForLogs = process.env.API_FF_MOVIL_DB_NAME_FOR_LOGS;
 
 export const redisClient = redis.createClient({
     socket: {
@@ -41,21 +41,28 @@ let zoneList = {};
 let clientList = {};
 
 export function getDbConfig(companyId) {
+    logPurple(JSON.stringify({
+        host: apiffDBHost,
+        user: apiffDBUser + companyId,
+        password: apiffDBPassword + companyId,
+        database: apiffDBName + companyId,
+        port: apiffDBPort
+    }));
     return {
-        host: API_FF_MOVIDBHost,
-        user: API_FF_MOVIDBUser + companyId,
-        password: API_FF_MOVIDBPassword + companyId,
-        database: API_FF_MOVIDBName,
-        port: API_FF_MOVIDBPort
+        host: apiffDBHost,
+        user: apiffDBUser + companyId,
+        password: apiffDBPassword + companyId,
+        database: apiffDBName + companyId,
+        port: apiffDBPort
     };
 }
 
 export const poolLocal = mysql2.createPool({
-    host: API_FF_MOVIDBHost,
-    user: API_FF_MOVIDbUserForLogs,
-    password: API_FF_MOVIDbPasswordForLogs,
-    database: API_FF_MOVIDbNameForLogs,
-    port: API_FF_MOVIDBPort,
+    host: apiffDBHost,
+    user: apiffDBUserForLogs,
+    password: apiffDBPasswordForLogs,
+    database: apiffDBNameForLogs,
+    port: apiffDBPort,
     waitForConnections: true,
     connectionLimit: 10,
     queueLimit: 0

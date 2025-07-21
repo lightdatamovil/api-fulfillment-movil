@@ -23,9 +23,7 @@ export function verificarTodo(req, res, requiredParams = [], requiredBodyFields 
             });
             logRed(`Error Status.badRequest ${req.method} ${req.originalUrl}: ${ex.toJsonString()}`);
             res.status(Status.badRequest).json(ex.toJSON());
-            return false;
         }
-        return true;
     }
 
     // 3) Para POST/PUT/PATCH/etc., validar campos obligatorios de body
@@ -44,7 +42,6 @@ export function verificarTodo(req, res, requiredParams = [], requiredBodyFields 
             });
             logRed(`Error Status.badRequest ${req.method} ${req.originalUrl}: ${ex.toJsonString()}`);
             res.status(Status.badRequest).json(ex.toJSON());
-            return false;
         }
     }
 
@@ -58,8 +55,5 @@ export function verificarTodo(req, res, requiredParams = [], requiredBodyFields 
         });
         logRed(`Error Status.badRequest ${req.method} ${req.originalUrl}: ${ex.toJsonString()}`);
         res.status(Status.badRequest).json(ex.toJSON());
-        return false;
     }
-
-    return true;
 }
