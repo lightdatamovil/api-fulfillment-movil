@@ -1,24 +1,7 @@
+import CustomException from "../models/custom_exception.js";
+import { Status } from "../models/status.js";
+import { logRed } from "./logCustom.js";
 
-
-
-export function verifyParamaters(body, parametrosRequeridos, userData = false) {
-    const param = ['deviceId', 'appVersion', 'brand', 'model', 'androidVersion', ...parametrosRequeridos];
-
-    if (userData) {
-        param.push('companyId', 'userId', 'profile');
-    }
-
-    const faltantes = param.filter(p => !(p in body))
-
-    if (faltantes.length > 0) {
-        return `Faltan los siguientes parámetros: ${faltantes.join(', ')}`;
-    }
-
-    return null;
-};// src/funciones/verificarAll.js
-import CustomException from "../../models/custom_exception.js";
-import { Status } from "../../models/status.js";
-import { logRed } from "./logsCustom.js";
 
 export function verificarTodo(req, res, requiredParams = [], requiredBodyFields = []) {
     const faltantes = [];

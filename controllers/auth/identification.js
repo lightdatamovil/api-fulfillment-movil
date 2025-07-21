@@ -1,12 +1,13 @@
 import axios from 'axios';
-import { logRed } from '../../src/funciones/logsCustom.js';
-import { getProdDbConfig } from '../../db.js';
 import mysql2 from 'mysql2';
 import { Status } from '../../models/status.js';
+import { logRed } from '../../src/logCustom.js';
 import CustomException from '../../models/custom_exception.js';
+import { getDbConfig } from '../../db.js';
+
 
 export async function identification(company) {
-    const dbConfig = getProdDbConfig(company);
+    const dbConfig = getDbConfig(company);
     const dbConnection = mysql2.createConnection(dbConfig);
     dbConnection.connect();
     const imageUrl = company.url + "/app-assets/images/logo/logo.png";
@@ -17,6 +18,7 @@ export async function identification(company) {
             const response = await axios.get(imageUrl, { responseType: 'arraybuffer' });
             const imageBuffer = Buffer.from(response.data, 'binary');
             imageBase64 = imageBuffer.toString('base64');
+            // eslint-disable-next-line no-unused-vars
         } catch (error) {
             imageBase64 = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAIAAAD8v+d+AAAAWElEQVRIDbXBAQEAAAABIP6PzgpV+QUwbGR2rqlzdkcNoiCqk73A0B9H5KLVmr4YdTiO8gaCGg8VmYWqJf2zxeI1icT24tFS0hDJ01gg7LMEx6qI3SCqA6Uq8gRJbAqioBgCRH0CpvI0dpjlGr6hQJYtsDRS0BQ==';
         }

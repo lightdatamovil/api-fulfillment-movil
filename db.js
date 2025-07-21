@@ -1,7 +1,7 @@
 import redis from 'redis';
 import dotenv from 'dotenv';
 import mysql2 from 'mysql2';
-import { logRed } from './src/logCustom.js';
+import { logRed, logYellow } from './src/logCustom.js';
 dotenv.config({ path: process.env.ENV_FILE || ".env" });
 
 /// Redis para obtener las empresas
@@ -20,10 +20,6 @@ const apimovilDBPort = process.env.APIMOVIL_DB_PORT;
 const apimovilDbUserForLogs = process.env.APIMOVIL_DB_USER_FOR_LOGS;
 const apimovilDbPasswordForLogs = process.env.APIMOVIL_DB_PASSWORD_FOR_LOGS;
 const apimovilDbNameForLogs = process.env.APIMOVIL_DB_NAME_FOR_LOGS;
-
-// Produccion
-const hostProductionDb = process.env.PRODUCTION_DB_HOST;
-const portProductionDb = process.env.PRODUCTION_DB_PORT;
 
 export const redisClient = redis.createClient({
     socket: {
@@ -48,8 +44,8 @@ export function getDbConfig(companyId) {
     return {
         host: apimovilDBHost,
         user: apimovilDBUser + companyId,
-        password: apimovilDBPassword,
-        database: apimovilDBName + companyId,
+        password: apimovilDBPassword + companyId,
+        database: apimovilDBName,
         port: apimovilDBPort
     };
 }
@@ -64,16 +60,6 @@ export const poolLocal = mysql2.createPool({
     connectionLimit: 10,
     queueLimit: 0
 });
-
-export function getProdDbConfig(company) {
-    return {
-        host: hostProductionDb,
-        user: company.dbuser,
-        password: company.dbpass,
-        database: company.dbname,
-        port: portProductionDb,
-    };
-}
 
 export async function updateRedis(empresaId, envioId, choferId) {
     const DWRTE = await redisClient.get('DWRTE',);
@@ -143,7 +129,7 @@ export async function getCompanyByCode(companyCode) {
         }
 
         for (const key in companiesList) {
-            if (companiesList.hasOwnProperty(key)) {
+            if (Object.prototype.hasOwnProperty.call(companiesList, key)) {
                 const currentCompany = companiesList[key];
                 if (String(currentCompany.codigo) === String(companyCode)) {
                     company = currentCompany;
