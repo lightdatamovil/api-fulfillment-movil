@@ -34,6 +34,7 @@ redisClient.on('error', (error) => {
 });
 
 let companiesList = {};
+let companiesFFList = {};
 
 let accountList = {};
 let driverList = {};
@@ -88,6 +89,17 @@ export async function updateRedis(empresaId, envioId, choferId) {
     await redisClient.set('DWRTE', JSON.stringify(DWRTE));
 }
 
+async function loadCompaniesFFFromRedis() {
+    try {
+        const companiesListString = await redisClient.get('empresasDataFF');
+
+        companiesFFList = JSON.parse(companiesListString);
+
+    } catch (error) {
+        logRed(`Error en loadCompaniesFromRedis: ${error.stack}`);
+        throw error;
+    }
+}
 async function loadCompaniesFromRedis() {
     try {
         const companiesListString = await redisClient.get('empresasData');
@@ -123,33 +135,23 @@ export async function getCompanyById(companyId) {
 }
 
 export async function getCompanyByCode(companyCode) {
-    try {
-        let company;
+    let company;
 
-        if (Object.keys(companiesList).length === 0) {
-            try {
-                await loadCompaniesFromRedis();
-            } catch (error) {
-                logRed(`Error al cargar compañías desde Redis: ${error.stack}`);
-                throw error;
-            }
-        }
-
-        for (const key in companiesList) {
-            if (Object.prototype.hasOwnProperty.call(companiesList, key)) {
-                const currentCompany = companiesList[key];
-                if (String(currentCompany.codigo) === String(companyCode)) {
-                    company = currentCompany;
-                    break;
-                }
-            }
-        }
-
-        return company;
-    } catch (error) {
-        logRed(`Error en getCompanyByCode: ${error.stack}`);
-        throw error;
+    if (Object.keys(companiesFFList).length === 0) {
+        await loadCompaniesFFFromRedis();
     }
+
+    for (const key in companiesFFList) {
+        if (Object.prototype.hasOwnProperty.call(companiesFFList, key)) {
+            const currentCompany = companiesFFList[key];
+            if (String(currentCompany.codigo) === String(companyCode)) {
+                company = currentCompany;
+                break;
+            }
+        }
+    }
+
+    return company;
 }
 
 async function loadAccountList(dbConnection, companyId, senderId) {
