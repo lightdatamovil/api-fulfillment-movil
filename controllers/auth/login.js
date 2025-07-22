@@ -1,22 +1,26 @@
-import jwt from "jsonwebtoken";
 import CustomException from "../../models/custom_exception.js";
 import { Status } from "../../models/status.js";
 import { executeQuery } from "../../db.js";
+import crypto from "crypto";
+import { logYellow } from "../../src/logCustom.js";
 
-
-function generateToken(userId, idEmpresa, perfil) {
-    const payload = { userId, perfil, idEmpresa };
-    const options = { expiresIn: "2558h" };
-    return jwt.sign(payload, "ruteate", options);
-}
-export async function login(username, password, company, conn) {
-
-    const empresaInfo = global.empresasCodigos[company];
+export async function login(conn, username, password) {
 
     const query = 'SELECT id, nombre, email, password FROM usuarios WHERE email = ? AND eliminado = 0 LIMIT 1';
-    // Usar la conexión 'conn' en executeQuery
-    const [userRow] = await executeQuery(conn, query, [username], true);
+    const [userRow] = await executeQuery(conn, query, [username]);
 
+    const hashPassword = crypto
+        .createHash("sha256")
+        .update(password)
+        .digest("hex");
+    logYellow(`Hash de la contraseña: ${hashPassword}`);
+    logYellow(`Usuario: ${userRow.password}`);
+    if (userRow.password !== hashPassword) {
+        throw new CustomException({
+            title: "Contraseña incorrecta",
+            message: "La contraseña ingresada no coincide",
+        });
+    }
     if (!userRow) {
         throw new CustomException({
             title: 'Credenciales inválidas',
@@ -25,20 +29,12 @@ export async function login(username, password, company, conn) {
         });
     }
 
-    const incomingHash = generateToken(password);
-
-    if (incomingHash !== userRow.password) {
-        throw new CustomException({
-            title: 'Credenciales inválidas',
-            message: 'Email o contraseña incorrectos',
-            status: Status.unauthorized
-        });
-    }
-    const token = generateToken(username, password, company)
 
     const { id, nombre, email: mail } = userRow;
 
     return {
-        id: id, token, nombre, email: mail,
+        id,
+        nombre,
+        email: mail,
     };
 }

@@ -31,17 +31,22 @@ auth.post('/login', async (req, res) => {
     const startTime = performance.now();
 
     const { username, password, companyId } = req.body;
+
+    const dbConfig = getDbConfig(companyId);
+    const dbConnection = mysql2.createConnection(dbConfig);
+    let conn = dbConnection.connect();
+
     try {
         verificarTodo(req, res, [], ['username', 'password', 'companyId']);
-        const dbConfig = getDbConfig(companyId);
-        const dbConnection = mysql2.createConnection(dbConfig);
-        let conn = dbConnection.connect();
-        const result = await login(username, password, companyId, conn);
+
+        const result = await login(conn, username, password, companyId);
+
         logGreen(`Usuario logueado correctamente`);
         res.status(Status.ok).json({ body: result, message: "Usuario logueado correctamente" });
     } catch (error) {
         return handleError(req, res, error);
     } finally {
+        conn.end();
         const endTime = performance.now();
         logPurple(`Tiempo de ejecución: ${endTime - startTime} ms`);
     }

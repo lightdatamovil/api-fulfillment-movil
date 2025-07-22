@@ -94,7 +94,7 @@ async function loadCompaniesFFFromRedis() {
         const companiesListString = await redisClient.get('empresasDataFF');
 
         companiesFFList = JSON.parse(companiesListString);
-
+        logPurple(`Compañías FF cargadas desde Redis: ${JSON.stringify(companiesFFList)}`);
     } catch (error) {
         logRed(`Error en loadCompaniesFromRedis: ${error.stack}`);
         throw error;
@@ -141,14 +141,11 @@ export async function getCompanyByCode(companyCode) {
         await loadCompaniesFFFromRedis();
     }
 
-    for (const key in companiesFFList) {
-        if (Object.prototype.hasOwnProperty.call(companiesFFList, key)) {
-            const currentCompany = companiesFFList[key];
-            if (String(currentCompany.codigo) === String(companyCode)) {
-                company = currentCompany;
-                break;
-            }
-        }
+    if (companiesFFList[companyCode]) {
+        company = companiesFFList[companyCode];
+    } else {
+        logRed(`No se encontró la compañía con el código: ${companyCode}`);
+        throw new Error(`No se encontró la compañía con el código: ${companyCode}`);
     }
 
     return company;
