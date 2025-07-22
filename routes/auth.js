@@ -48,7 +48,19 @@ auth.post('/login', async (req, res) => {
 
     const { username, password, companyId } = req.body;
     try {
+<<<<<<< Updated upstream
         verificarTodo(req, res, [], ['username', 'password', 'companyId']);
+=======
+        const mensajeError = verificarTodo(req, res, [], ['username', 'password', 'companyId']);
+
+        if (mensajeError) {
+            throw new CustomException({
+                title: 'Error en login',
+                message: mensajeError,
+                status: Status.badRequest
+            });
+        }
+>>>>>>> Stashed changes
 
         const company = await getCompanyById(companyId);
 

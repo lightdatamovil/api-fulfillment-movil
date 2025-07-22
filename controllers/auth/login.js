@@ -1,25 +1,22 @@
-import mysql2 from "mysql2";
 import jwt from "jsonwebtoken";
 import CustomException from "../../models/custom_exception.js";
 import { Status } from "../../models/status.js";
-import { executeQuery, getDbConfig } from "../../db.js";
+import { executeQuery } from "../../db.js";
+
 
 function generateToken(userId, idEmpresa, perfil) {
     const payload = { userId, perfil, idEmpresa };
     const options = { expiresIn: "2558h" };
     return jwt.sign(payload, "ruteate", options);
 }
+export async function login(username, password, company, conn) {
 
-export async function login(username, password, company) {
-    const dbConfig = getDbConfig(company.did);
-    const dbConnection = mysql2.createConnection(dbConfig);
-    dbConnection.connect();
+    const empresaInfo = global.empresasCodigos[company];
 
-    const [userRow] = await executeQuery(
-        'SELECT id, nombre, email, password FROM usuarios WHERE email = ? AND eliminado = 0 LIMIT 1',
-        [username],
-        true
-    );
+    const query = 'SELECT id, nombre, email, password FROM usuarios WHERE email = ? AND eliminado = 0 LIMIT 1';
+    // Usar la conexión 'conn' en executeQuery
+    const [userRow] = await executeQuery(conn, query, [username], true);
+
     if (!userRow) {
         throw new CustomException({
             title: 'Credenciales inválidas',
