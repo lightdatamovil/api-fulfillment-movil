@@ -21,6 +21,7 @@ export async function login(conn, username, password) {
         throw new CustomException({
             title: "Contraseña incorrecta",
             message: "La contraseña ingresada no coincide",
+            status: Status.unauthorized
         });
     }
     if (!userRow) {
