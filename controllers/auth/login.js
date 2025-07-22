@@ -6,8 +6,16 @@ import { logYellow } from "../../src/logCustom.js";
 
 export async function login(conn, username, password) {
 
-    const query = 'SELECT id, nombre, mail, pass FROM usuarios WHERE mail = ? AND elim = 0 LIMIT 1';
+    const query = 'SELECT id, nombre, mail, pass, usuario FROM usuarios WHERE usuario = ? AND elim = 0 AND superado = 0 LIMIT 1';
     const [userRow] = await executeQuery(conn, query, [username]);
+
+    if (!userRow) {
+        throw new CustomException({
+            title: 'Credenciales inválidas',
+            message: 'Email o contraseña incorrectos',
+            status: Status.notFound
+        });
+    }
 
     const hashPassword = crypto
         .createHash("sha256")
@@ -17,7 +25,7 @@ export async function login(conn, username, password) {
     logYellow(`Hash de la contraseña: ${hashPassword}`);
     logYellow(`Usuario: ${userRow.password}`);
 
-    if (userRow.password !== hashPassword) {
+    if (userRow.pass !== hashPassword) {
         throw new CustomException({
             title: "Contraseña incorrecta",
             message: "La contraseña ingresada no coincide",
