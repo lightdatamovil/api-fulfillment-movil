@@ -16,6 +16,7 @@ export async function identification(company) {
 
     const result = {
         id: company.did * 1,
+        image: ''
         // plan: company.plan * 1,
         // url: company.url,
         // country: company.pais * 1,
